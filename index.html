@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>11 Meses a tu lado ❤️</title>
+    <!-- Fuentes de Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f051d;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text-color: #f3f0f7;
+            --accent-pink: #ff477e;
+            --accent-purple: #c77dff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            max-width: 100vw;
+            overflow-x: hidden;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Montserrat', sans-serif;
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Pantalla de Bienvenida con Regalo Interactivo Animado */
+        #welcomeOverlay {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at center, #2b0c3f 0%, #0f051d 80%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 1rem;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .welcome-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 71, 126, 0.3);
+            padding: 2.5rem 1.5rem;
+            border-radius: 25px;
+            width: 90%;
+            max-width: 420px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+            animation: wrapperFloat 4s ease-in-out infinite;
+        }
+
+        .welcome-card h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.8rem, 4vw, 2.2rem);
+            color: var(--accent-pink);
+            margin-bottom: 1rem;
+        }
+
+        .welcome-card p {
+            color: #e2d9f3;
+            font-size: clamp(0.95rem, 2vw, 1rem);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        /* Regalo Interactivo */
+        .gift-box {
+            font-size: clamp(60px, 10vw, 75px);
+            cursor: pointer;
+            margin-bottom: 1.5rem;
+            animation: bounceGift 1.2s ease-in-out infinite;
+            display: inline-block;
+            transition: transform 0.2s ease;
+            filter: drop-shadow(0 0 15px rgba(255, 71, 126, 0.6));
+        }
+
+        .gift-box:hover {
+            transform: scale(1.2);
+        }
+
+        @keyframes bounceGift {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(5deg); }
+        }
+
+        .enter-btn {
+            background: linear-gradient(135deg, var(--accent-pink) 0%, #ff7aa2 100%);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(255, 71, 126, 0.4);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .enter-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 30px rgba(255, 71, 126, 0.6);
+        }
+
+        /* 🎵 REPRODUCTOR DE MÚSICA FLOTANTE */
+        .music-float-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 999;
+            display: none;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .music-toggle-btn {
+            background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.3rem;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease;
+            animation: pulseGlow 2s infinite alternate;
+        }
+
+        .music-toggle-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .music-playlist-box {
+            position: absolute;
+            bottom: 65px;
+            right: 0;
+            background: rgba(15, 5, 29, 0.95);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 71, 126, 0.4);
+            border-radius: 15px;
+            width: 270px;
+            max-width: 85vw;
+            padding: 1rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .music-playlist-box.active {
+            display: flex;
+        }
+
+        .music-playlist-box h4 {
+            font-family: 'Playfair Display', serif;
+            color: var(--accent-pink);
+            font-size: 1rem;
+            margin-bottom: 4px;
+            text-align: center;
+        }
+
+        .playlist-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+            color: #e2d9f3;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .playlist-item:hover, .playlist-item.playing {
+            background: rgba(255, 71, 126, 0.2);
+            border-color: var(--accent-pink);
+            color: white;
+        }
+
+        .music-controls-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        .control-mini-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            flex: 1;
+            transition: background 0.2s;
+        }
+
+        .control-mini-btn:hover {
+            background: var(--accent-pink);
+        }
+
+        /* Fondo dinámico */
+        .background-glow {
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle at 50% 20%, #2b0c3f 0%, var(--bg-color) 70%);
+            z-index: -1;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+
+        /* Corazones flotantes de fondo */
+        .heart-bg {
+            position: fixed;
+            color: rgba(255, 71, 126, 0.3);
+            font-size: 20px;
+            animation: floatUp 6s linear infinite;
+            bottom: -50px;
+            z-index: 1;
+            pointer-events: none;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-105vh) rotate(360deg); opacity: 0; }
+        }
+
+        header {
+            text-align: center;
+            padding: 2.5rem 1rem 1.5rem 1rem;
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.8rem, 4.5vw, 2.8rem);
+            color: var(--accent-pink);
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: clamp(0.95rem, 2.2vw, 1.15rem);
+            color: var(--accent-purple);
+            font-weight: 300;
+        }
+
+        /* Contenedor Principal Centrado y Ultra Adaptable */
+        .content-section {
+            width: 100%;
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 0 1rem 4rem 1rem;
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Sección del Contador Regresivo */
+        .countdown-container {
+            width: 100%;
+            margin-bottom: 2rem;
+            padding: clamp(1.2rem, 3vw, 2rem);
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .countdown-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+            margin-bottom: 1.2rem;
+            color: #fff;
+        }
+
+        .timer-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: clamp(0.4rem, 1.2vw, 0.8rem);
+            width: 100%;
+        }
+
+        .time-box {
+            background: rgba(255, 71, 126, 0.1);
+            border: 1px solid rgba(255, 71, 126, 0.3);
+            padding: clamp(0.5rem, 1.2vw, 0.8rem);
+            border-radius: 12px;
+            transition: transform 0.3s ease;
+        }
+
+        .time-box:hover {
+            transform: scale(1.03);
+            background: rgba(255, 71, 126, 0.2);
+        }
+
+        .time-box span {
+            display: block;
+            font-size: clamp(1.3rem, 3.5vw, 2.2rem);
+            font-weight: 600;
+            color: var(--accent-pink);
+        }
+
+        .time-box label {
+            font-size: clamp(0.6rem, 1vw, 0.75rem);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #d8b4fe;
+        }
+
+        /* Tarjetas de Contenido General */
+        .card {
+            width: 100%;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 18px;
+            padding: clamp(1.5rem, 3vw, 2.2rem);
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(199, 125, 255, 0.3);
+        }
+
+        .card h2 {
+            font-family: 'Playfair Display', serif;
+            color: var(--accent-purple);
+            margin-bottom: 1.2rem;
+            font-size: clamp(1.3rem, 2.3vw, 1.7rem);
+        }
+
+        .card p {
+            line-height: 1.7;
+            color: #e2d9f3;
+            font-size: clamp(0.92rem, 1.5vw, 1.05rem);
+            margin-bottom: 1.2rem;
+        }
+
+        .game-list {
+            margin-left: 1.2rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .game-list li {
+            margin-bottom: 0.8rem;
+            color: #e2d9f3;
+            font-size: clamp(0.88rem, 1.5vw, 1rem);
+            line-height: 1.6;
+        }
+
+        .secret-warning {
+            background: rgba(255, 71, 126, 0.15);
+            border-left: 4px solid var(--accent-pink);
+            padding: 1.2rem;
+            border-radius: 0 12px 12px 0;
+            margin-top: 1.5rem;
+            font-style: italic;
+            color: #ffd1dc;
+            font-size: clamp(0.88rem, 1.5vw, 0.98rem);
+        }
+
+        /* 💖 SECCIÓN ESPECIAL DE AMOR GIGANTE */
+        .love-dedication {
+            width: 100%;
+            background: linear-gradient(135deg, rgba(255, 71, 126, 0.15) 0%, rgba(199, 125, 255, 0.2) 100%);
+            border: 2px solid rgba(255, 71, 126, 0.4);
+            border-radius: 20px;
+            padding: clamp(2rem, 4vw, 2.8rem) clamp(1rem, 2vw, 2rem);
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 35px rgba(255, 71, 126, 0.3);
+            position: relative;
+            overflow: hidden;
+            animation: pulseLoveCard 3s infinite alternate;
+        }
+
+        @keyframes pulseLoveCard {
+            0% { box-shadow: 0 10px 25px rgba(255, 71, 126, 0.2); border-color: rgba(255, 71, 126, 0.3); }
+            100% { box-shadow: 0 15px 45px rgba(255, 71, 126, 0.5); border-color: var(--accent-pink); }
+        }
+
+        .love-dedication h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.6rem, 4vw, 2.5rem);
+            color: #ff7aa2;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 20px rgba(255, 71, 126, 0.5);
+            line-height: 1.3;
+        }
+
+        .love-dedication p {
+            font-size: clamp(1.1rem, 2.8vw, 1.5rem);
+            font-weight: 600;
+            color: #ffffff;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            margin-top: 0.5rem;
+        }
+
+        .floating-hearts-container {
+            font-size: clamp(1.4rem, 2.8vw, 1.8rem);
+            margin-top: 0.8rem;
+            animation: bounceGift 1.5s ease-in-out infinite;
+        }
+
+        /* Galería de Fotos Adaptable y Centrada */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.2rem;
+            margin-top: 1.5rem;
+            width: 100%;
+        }
+
+        .gallery-item {
+            background: rgba(20, 8, 35, 0.8);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 71, 126, 0.2);
+            text-align: center;
+            padding-bottom: 1rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(255, 71, 126, 0.3);
+            border-color: var(--accent-pink);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 220px;
+            object-fit: contain;
+            background-color: #0b0214;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 8px;
+            cursor: pointer;
+            transition: transform 0.5s ease;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.02);
+        }
+
+        .gallery-item p {
+            padding: 0.8rem 0.6s 0 0.6rem;
+            font-size: 0.85rem;
+            font-style: italic;
+            color: #d8b4fe;
+        }
+
+        /* -------------------------------------------------------------------------
+           🔍 VENTANA MODAL / LIGHTBOX PERFECTAMENTE CENTRADA
+           ------------------------------------------------------------------------- */
+        #imageModal {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 3, 20, 0.95);
+            backdrop-filter: blur(12px);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            cursor: zoom-out;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        #imageModal.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 85vw;
+            max-height: 85vh;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #modalImage {
+            max-width: 100%;
+            max-height: 68vh;
+            object-fit: contain;
+            border-radius: 12px;
+            box-shadow: 0 15px 50px rgba(255, 71, 126, 0.4);
+            border: 2px solid rgba(255, 71, 126, 0.4);
+            background-color: #05010a;
+        }
+
+        #modalCaption {
+            margin-top: 1rem;
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(0.95rem, 2vw, 1.2rem);
+            color: #ffd1dc;
+            font-style: italic;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: -45px;
+            right: 0;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            background: rgba(255, 71, 126, 0.3);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s ease;
+        }
+
+        .close-modal:hover {
+            background: var(--accent-pink);
+        }
+
+        .intensity-mode {
+            animation: pulseGlow 2s infinite alternate;
+            border-color: var(--accent-pink) !important;
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 15px rgba(255, 71, 126, 0.2); }
+            100% { box-shadow: 0 0 40px rgba(255, 71, 126, 0.6); }
+        }
+
+        @keyframes wrapperFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            font-size: 0.85rem;
+            color: #9a8c98;
+            position: relative;
+            z-index: 10;
+            width: 100%;
+        }
+
+        @media (max-width: 480px) {
+            .timer-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .content-section {
+                padding: 0 0.5rem 3rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Pantalla de Bienvenida con Regalo Interactivo Animado -->
+    <div id="welcomeOverlay">
+        <div class="welcome-card">
+            <h2>Para ti, mi amor ❤️</h2>
+            <div class="gift-box" onclick="enterSurprise()">🎁</div>
+            <p>Toca el regalo para abrir la sorpresa y activar nuestra música.</p>
+            <button class="enter-btn" onclick="enterSurprise()">Abrir Sorpresa ✨</button>
+        </div>
+    </div>
+
+    <!-- 🎵 BOTÓN FLOTANTE Y LISTA DE MÚSICA DESPLEGABLE -->
+    <div id="musicWidget" class="music-float-widget">
+        <div id="playlistBox" class="music-playlist-box">
+            <h4>🎵 Playlist de Amor</h4>
+            <div id="playlistItemsContainer"></div>
+            <div class="music-controls-row">
+                <button class="control-mini-btn" onclick="togglePlayPause()">⏸️ Pausa/Play</button>
+                <button class="control-mini-btn" onclick="playNextSong()">⏭️ Siguiente</button>
+            </div>
+        </div>
+        <button class="music-toggle-btn" onclick="togglePlaylistMenu()" title="Controlar Música">🎵</button>
+    </div>
+
+    <!-- Ventana Modal / Lightbox para ver la imagen en grande -->
+    <div id="imageModal" onclick="closeModal()">
+        <div class="modal-content-wrapper" onclick="event.stopPropagation()">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <img id="modalImage" src="" alt="Imagen ampliada">
+            <p id="modalCaption"></p>
+        </div>
+    </div>
+
+    <div class="background-glow"></div>
+
+    <!-- Elemento de audio invisible -->
+    <audio id="bgAudio"></audio>
+
+    <header>
+        <h1>Felices 11 Meses, Mi Amor ❤️</h1>
+        <p class="subtitle">Cada segundo que pasa es uno menos para abrazarte en el aeropuerto</p>
+    </header>
+
+    <main class="content-section">
+        
+        <!-- 💖 DEDICATORIA GIGANTE CON CORAZONES -->
+        <div class="love-dedication">
+            <div class="floating-hearts-container">❤️❤️❤️❤️❤️</div>
+            <h2>TE AMO MI AMOR, MI ESPOSA PRECIOSA</h2>
+            <p>MARILYN JOSEFINA HERRERA GARRIDO</p>
+            <p style="font-size: clamp(1.1rem, 2.5vw, 1.4rem); color: #ffd1dc; margin-top: 0.8rem;">ERES MI MUNDO ENTERO</p>
+            <div class="floating-hearts-container">💖 💓 💕 💞 💘</div>
+        </div>
+
+        <!-- 1. Cuenta Regresiva Arriba -->
+        <div class="countdown-container" id="countdownCard">
+            <h2 class="countdown-title">⏳ Cuenta regresiva para nuestro reencuentro ✈️</h2>
+            <div class="timer-grid">
+                <div class="time-box">
+                    <span id="days">00</span>
+                    <label>Días</label>
+                </div>
+                <div class="time-box">
+                    <span id="hours">00</span>
+                    <label>Horas</label>
+                </div>
+                <div class="time-box">
+                    <span id="minutes">00</span>
+                    <label>Minutos</label>
+                </div>
+                <div class="time-box">
+                    <span id="seconds">00</span>
+                    <label>Segundos</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Tu carta completa -->
+        <div class="card">
+            <h2>Nuestros 11 Meses Juntos</h2>
+            <p>Hola mi amor, parece mentira que ya llevamos 11 meses. Todavía recuerdo cuando te vi bailando en la kantina de Roblox y llegaste y me bailaste; desde ese momento todo cambió en mi vida y sé que en la tuya también, empezamos a conocernos, me contaste sobre ti y yo sobre mí, nos reímos, nos enojamos, jaja. Fue una forma muy loca la verdad en cómo se dio lo nuestro mi amor, pero créeme que no cambiaría por nada del mundo todo lo que hemos vivido, todo me parece perfecto: los enojos, las risas, las tristezas, lo calenturientos... Y qué loco saber que nos conocimos un 9 de enero y ya hoy es 9 de noviembre.</p>
+            <p>Sé que han pasado muchas cosas, has superado un montón de cosas y sabes, me pone súper contento saber que mi novia es una mujer así de maravillosa; vales muchísimo más de lo que te imaginas, amor. Yo te amo con todo mi ser y siempre te amaré. Sé que en algunos momentos te surgen dudas de que si está bien estar conmigo, pero sabes, yo te amo con todo mi ser y te lo demostraré cada día de mi vida.</p>
+            <p>Gracias a ti me he hecho más cercano con Jehová, y cómo no, si él fue quien nos unió. Mira todo lo bien que nos ha salido todo. Es momento de que seamos felices y vivamos nuestra vida como siempre quisimos, mi amor, ya que somos iguales el uno y el otro. En serio, gracias por ser mi novia y próximamente mi esposa. Siempre estaré agradecido con Jehová por ponerte en mi camino, mi amor hermosa.</p>
+        </div>
+
+        <!-- 3. Lo que haremos cuando nos veamos -->
+        <div class="card">
+            <h2>Nuestros Planes al Vernos ✨</h2>
+            <p>El 28 de diciembre a la 12:00 p.m. estaré esperándote en la puerta de llegadas para darte el abrazo más fuerte del mundo. Desde ese instante, nuestra lista de planes comienza:</p>
+            <br>
+            <p>☕ Disfrutar de un buen café juntos platicando sin mirar la pantalla de un celular.</p>
+            <p>🚗 Salir a recorrer y pasar tiempo de calidad sin preocuparnos por el reloj.</p>
+            
+            <br>
+            <p><strong>🎁 Además, para celebrar que estamos a un solo paso de cumplir nuestro año (12 meses), jugaremos a regalarnos una cosa de cada color.</strong> Ojo: no tienen que ser regalos caros, puede ser un dulce, una paleta, una galleta, un juguito, lo que se te ocurra amor. <strong>Todo este juego de los 12 colores lo realizaremos por la noche</strong>, cuando ya estemos cómodos, tranquilos y a solas:</p>
+            
+            <ul class="game-list">
+                <li>🔴 <strong>1. Rojo:</strong> La pasión y la energía de este reencuentro.</li>
+                <li>🔵 <strong>2. Azul:</strong> La tranquilidad de saber que por fin estamos juntos.</li>
+                <li>🟢 <strong>3. Verde:</strong> La esperanza y vida que le das a mis días.</li>
+                <li>🟡 <strong>4. Amarillo:</strong> La alegría inmensa de este momento.</li>
+                <li>🟠 <strong>5. Naranja:</strong> La chispa y la diversión que nunca faltan entre nosotros.</li>
+                <li>🟣 <strong>6. Morado:</strong> La magia de conectar a la distancia y en persona.</li>
+                <li>🌸 <strong>7. Rosado:</strong> La ternura de todo lo bonito que hemos construido.</li>
+                <li>🟤 <strong>8. Café:</strong> Los momentos cálidos y las charlas de café que compartimos.</li>
+                <li>⚫ <strong>9. Negro:</strong> La elegancia y la seguridad de nuestro amor firme.</li>
+                <li>🔘 <strong>10. Gris:</strong> La constancia de superar cualquier obstáculo juntos.</li>
+                <li>🟡 <strong>11. Dorado:</strong> El valor incalculable de estos 11 meses a tu lado.</li>
+                <li>⚪ <strong>12. Blanco (De último):</strong> El color más misterioso y especial de todos. Se entregará al final de la noche, cuando estemos completamente solos y cómodos; su significado exacto y la gran sorpresa se revelarán en ese momento tan íntimo. 🤫✨💍</li>
+            </ul>
+
+            <div class="secret-warning">
+                ⚠️ <strong>Aviso importante:</strong> ¡Nadie puede revelar nada de esto antes de tiempo! Todo será revelado ese día. ¡Prepárate para la sorpresa!
+            </div>
+        </div>
+
+        <!-- 4. Galería de Recuerdos / Tus 10 Imágenes Completas -->
+        <div class="card">
+            <h2>Nuestros Momentos Especiales 📸</h2>
+            <p>Un pequeño recordatorio visual de lo mucho que te amo y lo hermosa que haces mi vida. ¡Toca cualquier foto para verla en grande!</p>
+            
+            <div class="gallery-grid">
+                <div class="gallery-item">
+                    <img src="https://i.ibb.co/N6HLQhf7/Whats-App-Image-2026-11-08-at-11-39-45-PM.jpg" alt="Recuerdo 1" onclick="openModal(this)">
+                    <p>"Nuestro amor cruza fronteras"</p>
+                </div>
+                <div class="gallery-item">
+                    <img src="https://i.ibb.co/RTsZ6g42/Whats-App-Image-2026-11-08-at-11-41-17-PM.jpg" alt="Recuerdo 2" onclick="openModal(this)">
+                    <p>"Cada día más cerca de ti"</p>
+                </div>
+                <div class="gallery-item">
+                    <img src="https://i.ibb.co/FL4NycYP/Whats-App-Image-2026-11-08-at-11-39-45-PM-4.jpg" alt="Recuerdo 3" onclick="openModal(this)">
+                    <p>"Contigo todo es perfecto"</p>
+                </div>
+                <div class="gallery-item">
+                    <img src="https://i.ibb.co/4gjQH8hf/Whats-App-Image-2026-11-08-at-11-39-45-PM-3.jpg" alt="Recuerdo 4" onclick="openModal(this)">
+                    <p>"Mi persona favorita"</p>
+                </div>
+                <div class="gallery-item">
+                    <img src="https://i.ibb.co/JWZmTNmH/Whats-App-Image-2026-11-08-at-11-39-45-PM-1.jpg" alt="Recuerdo 5" onclick="openModal(this)">
+                    <p>"Esperando nuestro gran abrazo"</p>
+                </div>
+                <div class="gallery-item">
+                    <img src="https://i.ibb.co/7xqSMbcT/Whats-App-Image-2026-11-08-at-11-39-45-PM-2.jpg" alt="Recuerdo 6" onclick="openModal(this)">
+                    <p>"Juntos por siempre"</p>
+                </div>
+                <div class="gallery-item">
+                    <img src="https://i.ibb.co/Y7gxpnwd/Whats-App-Image-2026-07-11-at-9-18-24-AM-1.jpg" alt="Recuerdo 7" onclick="openModal(this)">
+                    <p>"Amor sin medidas"</p>
+                </div>
+                <div class="gallery-item">
+                    <img src="https://i.ibb.co/C5wY9FMg/Whats-App-Image-2026-07-11-at-9-18-24-AM.jpg" alt="Recuerdo 8" onclick="openModal(this)">
+                    <p>"Tu sonrisa lo ilumina todo"</p>
+                </div>
+                <div class="gallery-item">
+                    <img src="https://i.ibb.co/mrnYhb4W/Whats-App-Image-2026-07-11-at-9-18-24-AM-2.jpg" alt="Recuerdo 9" onclick="openModal(this)">
+                    <p>"Creando nuestros mejores recuerdos"</p>
+                </div>
+                <div class="gallery-item">
+                    <img src="https://i.ibb.co/vxPq3Cyf/Whats-App-Image-2026-07-11-at-9-19-24-AM.jpg" alt="Recuerdo 10" onclick="openModal(this)">
+                    <p>"Pronto juntos mi amor"</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer>
+        <p>Hecho con todo mi amor para ti • Faltan muy pocos días para fundirnos en un abrazo ❤️</p>
+    </footer>
+
+    <script>
+        // -------------------------------------------------------------------------
+        // 🔍 FUNCIONES PARA AMPLIAR LAS IMÁGENES (LIGHTBOX)
+        // -------------------------------------------------------------------------
+        function openModal(imgElement) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            const modalCaption = document.getElementById('modalCaption');
+            
+            modal.classList.add('active');
+            modalImg.src = imgElement.src;
+            
+            const captionText = imgElement.parentElement.querySelector('p').innerText;
+            modalCaption.innerText = captionText;
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.remove('active');
+        }
+
+
+        // -------------------------------------------------------------------------
+        // 🎵 MÚSICA CON NOMBRES REALES, PLAYLIST DESPLEGABLE Y MEMORIA
+        // -------------------------------------------------------------------------
+        const playlist = [
+            { title: "Air Supply - Making Love Out Of Nothing At All", url: "https://mp3tourl.com/audio/1794199445090-c5f9453c-efaf-40ff-89fa-91c7a74364da.mp3" },
+            { title: "Gary Moore: Still Got The Blues", url: "https://mp3tourl.com/audio/1794201530317-71dbb4b8-988f-42a6-8b70-5ebeabe18132.mp3" },
+            { title: "Robbie Williams - Feel", url: "https://mp3tourl.com/audio/1794201622327-dc657fbb-71c2-4f5c-9d58-7dded527d9bb.mp3" },
+            { title: "Conjunto Primavera - Necesito Decirte", url: "https://mp3tourl.com/audio/1794201943838-278c6d7c-d72a-4c19-97fc-d593bf358aa9.mp3" },
+            { title: "La Mafia - Me Estoy Enamorando", url: "https://mp3tourl.com/audio/1794202118520-9d3d0220-28e5-4f71-a773-6a7318bc353f.mp3" }
+        ];
+
+        const volumenFijo = 0.30; 
+        const audio = document.getElementById('bgAudio');
+
+        let currentSongIndex = parseInt(localStorage.getItem('savedSongIndex'));
+        let savedTime = parseFloat(localStorage.getItem('savedSongTime')) || 0;
+
+        if (isNaN(currentSongIndex) || currentSongIndex < 0 || currentSongIndex >= playlist.length) {
+            currentSongIndex = Math.floor(Math.random() * playlist.length);
+        }
+
+        audio.src = playlist[currentSongIndex].url;
+        audio.currentTime = savedTime;
+        audio.volume = volumenFijo;
+
+        function buildPlaylistUI() {
+            const container = document.getElementById('playlistItemsContainer');
+            container.innerHTML = '';
+            playlist.forEach((song, idx) => {
+                const div = document.createElement('div');
+                div.className = `playlist-item ${idx === currentSongIndex ? 'playing' : ''}`;
+                div.innerText = `${idx + 1}. ${song.title}`;
+                div.onclick = () => selectAndPlaySong(idx);
+                container.appendChild(div);
+            });
+        }
+
+        function togglePlaylistMenu() {
+            const box = document.getElementById('playlistBox');
+            box.classList.toggle('active');
+        }
+
+        function selectAndPlaySong(index) {
+            currentSongIndex = index;
+            audio.src = playlist[currentSongIndex].url;
+            audio.currentTime = 0;
+            audio.play().catch(e => console.log(e));
+            buildPlaylistUI();
+        }
+
+        function togglePlayPause() {
+            if (audio.paused) {
+                audio.play();
+            } else {
+                audio.pause();
+            }
+        }
+
+        function playNextSong() {
+            currentSongIndex = (currentSongIndex + 1) % playlist.length;
+            audio.src = playlist[currentSongIndex].url;
+            audio.currentTime = 0;
+            audio.play().catch(e => console.log(e));
+            buildPlaylistUI();
+        }
+
+        function enterSurprise() {
+            const overlay = document.getElementById('welcomeOverlay');
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                overlay.style.display = 'none';
+            }, 800);
+
+            audio.play().catch(e => console.log("Audio play error:", e));
+            document.getElementById('musicWidget').style.display = 'flex';
+            buildPlaylistUI();
+        }
+
+        audio.addEventListener('ended', () => {
+            playNextSong();
+        });
+
+        setInterval(() => {
+            if (!audio.paused) {
+                localStorage.setItem('savedSongTime', audio.currentTime);
+                localStorage.setItem('savedSongIndex', currentSongIndex);
+            }
+        }, 1000);
+
+        window.addEventListener('beforeunload', () => {
+            localStorage.setItem('savedSongTime', audio.currentTime);
+            localStorage.setItem('savedSongIndex', currentSongIndex);
+        });
+
+
+        // -------------------------------------------------------------------------
+        // ⏳ CUENTA REGRESIVA
+        // -------------------------------------------------------------------------
+        const targetDate = new Date("December 28, 2026 13:00:00").getTime();
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const difference = targetDate - now;
+
+            if (difference < 0) {
+                document.getElementById("countdownCard").innerHTML = "<h2 style='color:var(--accent-pink); font-family:Playfair Display;'>¡El gran día ha llegado! Ya estás aquí conmigo ❤️✈️</h2>";
+                return;
+            }
+
+            const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60 * 60 / 60));
+            const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+            document.getElementById("days").innerText = String(days).padStart(2, '0');
+            document.getElementById("hours").innerText = String(hours).padStart(2, '0');
+            document.getElementById("minutes").innerText = String(minutes).padStart(2, '0');
+            document.getElementById("seconds").innerText = String(seconds).padStart(2, '0');
+
+            const card = document.getElementById("countdownCard");
+            if (days < 3) {
+                card.classList.add("intensity-mode");
+            }
+        }
+
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // Corazones flotantes animados en el fondo
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart-bg');
+            heart.innerText = '❤️';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = Math.random() * 3 + 4 + 's';
+            heart.style.fontSize = Math.random() * 15 + 15 + 'px';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 7000);
+        }
+        setInterval(createHeart, 400);
+    </script>
+</body>
+</html>
